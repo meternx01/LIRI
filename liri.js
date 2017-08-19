@@ -9,7 +9,7 @@ var args = process.argv;
 args.shift();
 args.shift();
 
-console.log(path);
+// console.log(path);
 
 
 //main execution
@@ -34,14 +34,19 @@ switch (args[0]){
 function myTweets() {
 	//This will show your last 20 tweets and when they were created at in your terminal/bash window.
 	// request("https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=TacochickenNode&count=20", function (error, response, body) {
-		console.log(keys);
+		// console.log(keys);
 		var client = new Twitter(keys);
 		var params = {screen_name: 'nodejs'};
-		client.get('statuses/user_timeline', params, function(error, tweets, response) {
-			console.log(error);
-			console.log(response);
+		client.get('statuses/home_timeline.json', params, function(error, tweets, response) {
+			// console.log(error);
+			// console.log(body);
 			if (!error) {
-			  console.log(tweets);
+				//var twweets = JSON.parse(tweets)
+				tweets.forEach(function(element) {
+					console.log("By @" + element.user.screen_name);
+					console.log(element.text);
+					console.log("--------------------------");					
+				}, this);
 			}
 		  });
 	// 	console.log(error);
