@@ -20,7 +20,10 @@ switch (args[0]) {
 		myTweets();
 		break;
 	case "spotify-this-song":
+		if(args.length == 2)
 		spotifyThisSong(args[1]);
+		else
+			spotifyThisSong("The Sign");
 		break;
 	case "movie-this":
 		movieThis();
@@ -74,14 +77,34 @@ function spotifyThisSong(song) {
 	// if no song is provided then your program will default to
 
 	// "The Sign" by Ace of Base
+	// console.log("Entered Spotify");
 	var Spotify = require('node-spotify-api');
 	var spotify = new Spotify(keys.spotify);
 	spotify.search({ type: 'track', query: song }, function (err, data) {
 		if (err) {
 			return console.log('Error occurred: ' + err);
 		}
-		console.log(data);
-	}
+		//console.log(JSON.stringify(data));
+		var results = data.tracks.items;
+		var i = 0;
+		var found = false;
+		// console.log(typeof results);
+		while (i<results.length && !found){
+			if (results[i].name.toUpperCase() == song.toUpperCase()){
+				found = true;
+				console.log("Artist Name: ", results[i].artists[0].name);
+				console.log("Track Name: ", results[i].name);
+				console.log("Preview: ", results[i].preview_url);
+				console.log("Album: ", results[i].album.name);
+			}
+			else
+				i++;
+		}
+		if (!found){
+			console.log("No song found with that name! Reprhrase?");
+		}
+	});
+}
 
 function movieThis() {
 			// This will output the following information to your terminal/bash window:
