@@ -13,9 +13,11 @@ args.shift();
 
 
 //main execution
-// if (args[0] == "do-what-it-says")
-// 	args = resolveAction()
+
 switch (args[0]) {
+	case "do-what-it-says":
+		resolveAction();
+		break;
 	case "my-tweets":
 		myTweets();
 		break;
@@ -86,7 +88,7 @@ function spotifyThisSong(song) {
 		if (err) {
 			return console.log('Error occurred: ' + err);
 		}
-		//console.log(JSON.stringify(data));
+		// console.log(JSON.stringify(data));
 		var results = data.tracks.items;
 		var i = 0;
 		var found = false;
@@ -124,33 +126,33 @@ function movieThis(movie) {
 	// If you haven't watched "Mr. Nobody," then you should: http://www.imdb.com/title/tt0485947/
 	// It's on Netflix!
 	var queryUrl = "http://www.omdbapi.com/?t=" + movie + "&y=&plot=short&apikey=" + keys.OMDB
-	
+
 	// This line is just to help us debug against the actual URL.
 	//console.log(queryUrl);
-	
-	request(queryUrl, function(error, response, body) {
-	
-	  // If the request is successful
-	  if (!error && response.statusCode === 200) {
-	
-		// Parse the body of the site and recover just the imdbRating
-		// (Note: The syntax below for parsing isn't obvious. Just spend a few moments dissecting it).
-		//console.log(body)
-		var urlTitle = JSON.parse(body).Title.toLowerCase().replace(/ /g,"_").replace(/[^\w\s]/gi, '');
-		//console.log(urlTitle)
-		console.log("Title: " + JSON.parse(body).Title);
-		console.log("Release Year: " + JSON.parse(body).Year);
-		console.log("IMDB Rating: " + JSON.parse(body).imdbRating);
-		console.log("Country: " + JSON.parse(body).Country);
-		console.log("Language: " + JSON.parse(body).Language);
-		console.log("----------------------------------------------------");
-		console.log("Plot: " + JSON.parse(body).Plot);
-		console.log("Starring: " + JSON.parse(body).Actors);
-		console.log("----------------------------------------------------");
-		console.log("Rotten Tomatoes Review: https://www.rottentomatoes.com/m/"+urlTitle);
-	  }
+
+	request(queryUrl, function (error, response, body) {
+
+		// If the request is successful
+		if (!error && response.statusCode === 200) {
+
+			// Parse the body of the site and recover just the imdbRating
+			// (Note: The syntax below for parsing isn't obvious. Just spend a few moments dissecting it).
+			//console.log(body)
+			var urlTitle = JSON.parse(body).Title.toLowerCase().replace(/ /g, "_").replace(/[^\w\s]/gi, '');
+			//console.log(urlTitle)
+			console.log("Title: " + JSON.parse(body).Title);
+			console.log("Release Year: " + JSON.parse(body).Year);
+			console.log("IMDB Rating: " + JSON.parse(body).imdbRating);
+			console.log("Country: " + JSON.parse(body).Country);
+			console.log("Language: " + JSON.parse(body).Language);
+			console.log("----------------------------------------------------");
+			console.log("Plot: " + JSON.parse(body).Plot);
+			console.log("Starring: " + JSON.parse(body).Actors);
+			console.log("----------------------------------------------------");
+			console.log("Rotten Tomatoes Review: https://www.rottentomatoes.com/m/" + urlTitle);
+		}
 	});
-	
+
 }
 
 function outputToLog(command, outputText) {
@@ -159,6 +161,42 @@ function outputToLog(command, outputText) {
 
 function resolveAction() {
 	// Reads from Random.txt and determines what to do
+	fs.readFile(path + "random.txt", "utf8", function (error, data) {
 
-	return resultArray
+		// If the code experiences any errors it will log the error to the console.
+		if (error) {
+			return console.log(error);
+		}
+
+		// We will then print the contents of data
+		//   console.log(data);
+		//   console.log(typeof data);
+		// Then split it by commas (to make it more readable)
+		var dataArr = data.split(",");
+
+		// We will then re-display the content as an array for later use.
+		console.log(dataArr);
+		console.log(typeof dataArr);
+		console.log(dataArr.length);
+
+		 switch (dataArr[0]) {
+			case "my-tweets":
+				myTweets();
+				break;
+			case "spotify-this-song":
+				if (dataArr.length == 2)
+					spotifyThisSong(dataArr[1].replace(/['"]+/g, ''));
+				else
+					spotifyThisSong("The Sign");
+				break;
+			case "movie-this":
+				if (dataArr.length == 2)
+					movieThis(dataArr[1]);
+				else
+					movieThis("Mr. Nobody");
+				break;
+		}
+
+	});
+	// return resultArray
 }
