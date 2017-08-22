@@ -20,15 +20,17 @@ switch (args[0]) {
 		myTweets();
 		break;
 	case "spotify-this-song":
-		if(args.length == 2)
-		spotifyThisSong(args[1]);
+		if (args.length == 2)
+			spotifyThisSong(args[1]);
 		else
 			spotifyThisSong("The Sign");
 		break;
 	case "movie-this":
-		movieThis();
+		if (args.length == 2)
+			movieThis(args[1]);
+		else
+			movieThis("Mr. Nobody");
 		break;
-
 }
 
 //do-what-it-says - pulls from file random.txt
@@ -89,8 +91,8 @@ function spotifyThisSong(song) {
 		var i = 0;
 		var found = false;
 		// console.log(typeof results);
-		while (i<results.length && !found){
-			if (results[i].name.toUpperCase() == song.toUpperCase()){
+		while (i < results.length && !found) {
+			if (results[i].name.toUpperCase() == song.toUpperCase()) {
 				found = true;
 				console.log("Artist Name: ", results[i].artists[0].name);
 				console.log("Track Name: ", results[i].name);
@@ -100,35 +102,63 @@ function spotifyThisSong(song) {
 			else
 				i++;
 		}
-		if (!found){
+		if (!found) {
 			console.log("No song found with that name! Reprhrase?");
 		}
 	});
 }
 
-function movieThis() {
-			// This will output the following information to your terminal/bash window:
+function movieThis(movie) {
+	// This will output the following information to your terminal/bash window:
 
-			//   * Title of the movie.
-			//   * Year the movie came out.
-			//   * IMDB Rating of the movie.
-			//   * Country where the movie was produced.
-			//   * Language of the movie.
-			//   * Plot of the movie.
-			//   * Actors in the movie.
-			//   * Rotten Tomatoes URL.
-			// If the user doesn't type a movie in, the program will output data for the movie 'Mr. Nobody.'
+	//   * Title of the movie.
+	//   * Year the movie came out.
+	//   * IMDB Rating of the movie.
+	//   * Country where the movie was produced.
+	//   * Language of the movie.
+	//   * Plot of the movie.
+	//   * Actors in the movie.
+	//   * Rotten Tomatoes URL.
+	// If the user doesn't type a movie in, the program will output data for the movie 'Mr. Nobody.'
 
-			// If you haven't watched "Mr. Nobody," then you should: http://www.imdb.com/title/tt0485947/
-			// It's on Netflix!
-		}
+	// If you haven't watched "Mr. Nobody," then you should: http://www.imdb.com/title/tt0485947/
+	// It's on Netflix!
+	var queryUrl = "http://www.omdbapi.com/?t=" + movie + "&y=&plot=short&apikey=" + keys.OMDB
+	
+	// This line is just to help us debug against the actual URL.
+	//console.log(queryUrl);
+	
+	request(queryUrl, function(error, response, body) {
+	
+	  // If the request is successful
+	  if (!error && response.statusCode === 200) {
+	
+		// Parse the body of the site and recover just the imdbRating
+		// (Note: The syntax below for parsing isn't obvious. Just spend a few moments dissecting it).
+		//console.log(body)
+		var urlTitle = JSON.parse(body).Title.toLowerCase().replace(/ /g,"_").replace(/[^\w\s]/gi, '');
+		//console.log(urlTitle)
+		console.log("Title: " + JSON.parse(body).Title);
+		console.log("Release Year: " + JSON.parse(body).Year);
+		console.log("IMDB Rating: " + JSON.parse(body).imdbRating);
+		console.log("Country: " + JSON.parse(body).Country);
+		console.log("Language: " + JSON.parse(body).Language);
+		console.log("----------------------------------------------------");
+		console.log("Plot: " + JSON.parse(body).Plot);
+		console.log("Starring: " + JSON.parse(body).Actors);
+		console.log("----------------------------------------------------");
+		console.log("Rotten Tomatoes Review: https://www.rottentomatoes.com/m/"+urlTitle);
+	  }
+	});
+	
+}
 
 function outputToLog(command, outputText) {
-			// fs to log.txt
-		}
+	// fs to log.txt
+}
 
 function resolveAction() {
-			// Reads from Random.txt and determines what to do
+	// Reads from Random.txt and determines what to do
 
-			return resultArray
-		}
+	return resultArray
+}
