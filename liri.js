@@ -15,34 +15,41 @@ var Twitter = require('twitter');
 // Parsing the arguments
 // Pulling Path of the liri.js - avoids filesystem problems
 var leng = Math.max((process.argv[1].lastIndexOf('\\') + 1), (process.argv[1].lastIndexOf('/') + 1))
-var path = process.argv[1].slice(0, leng) 
+var path = process.argv[1].slice(0, leng)
 // Pull the arguments from the process object into my own array disregarding the node.js and liri.js paths
 var args = process.argv;
 args.shift();
 args.shift();
 
 //main execution
-switch (args[0]) {
-	case "do-what-it-says":
-		resolveAction();
-		break;
-	case "my-tweets":
-		myTweets();
-		break;
-	case "spotify-this-song":
-		if (args.length == 2)
-			spotifyThisSong(args[1]);
-		else
-			spotifyThisSong("The Sign");
-		break;
-	case "movie-this":
-		if (args.length == 2)
-			movieThis(args[1]);
-		else
-			movieThis("Mr. Nobody");
-		break;
-}
+if(args[0]=="do-what-it-says")
+	resolveAction();
+else
+	mainExecute();
 
+// mainExecute is a function that uses the global args that does the decision making
+// that forwards the code to its repective function
+function mainExecute(){
+	// args should be in format {Command, [Search Term]}
+	// so if the command is..
+	switch (args[0]) {
+		case "my-tweets":
+			myTweets();	// get tweets
+			break;
+		case "spotify-this-song":
+			if (args.length == 2)
+				spotifyThisSong(args[1]);	// search for song
+			else
+				spotifyThisSong("Never Gonna Give You Up");	// retrieve Rickroll
+			break;
+		case "movie-this":
+			if (args.length == 2)
+				movieThis(args[1]);	// search for movie
+			else
+				movieThis("Mr. Nobody");	// why this movie? - Not a fan
+			break;
+	}
+}
 // myTweets function queries the Twitter API on my timeline and returns 20 tweets to the console
 // This will show your last 20 tweets and when they were created at in your terminal/bash window
 function myTweets() {
@@ -55,6 +62,7 @@ function myTweets() {
 			// Parse the tweets
 			tweets.forEach(function (element) {
 				console.log("By @" + element.user.screen_name);
+				console.log("On: " + element.created_at);
 				console.log(element.text);
 				console.log("--------------------------");
 			}, this);
@@ -80,7 +88,7 @@ function spotifyThisSong(song) {
 		var i = 0;
 		var found = false;
 		// loop through the results, and stop either at the end, or if a match is found
-		while (i < results.length && !found) {	
+		while (i < results.length && !found) {
 			// if the name matches
 			if (results[i].name.toUpperCase() == song.toUpperCase()) {	// to find a match, force the case
 				// set found to escape loop
@@ -145,25 +153,10 @@ function resolveAction() {
 		}
 
 		// Parse the data into what would have been the arguement array
-		var dataArr = data.split(",");
-		switch (dataArr[0]) {
-			case "my-tweets":
-				myTweets();
-				break;
-			case "spotify-this-song":
-				if (dataArr.length == 2)
-					spotifyThisSong(dataArr[1].replace(/['"]+/g, ''));	// Remove the "s from the string
-				else
-					spotifyThisSong("The Sign");
-				break;
-			case "movie-this":
-				if (dataArr.length == 2)
-					movieThis(dataArr[1].replace(/['"]+/g, ''));	// Remove the "s from the string
-				else
-					movieThis("Mr. Nobody");
-				break;
-		}
-
+		args = data.split(",");
+		if (args.length == 2)
+			args[1] = args[1].replace(/['"]+/g, '');	// Remove the "s from the string
+		mainExecute();
 	});
 	// i wanted to return the arguments but due to async issues, decided against it
 }
